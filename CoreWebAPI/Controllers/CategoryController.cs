@@ -46,7 +46,8 @@ namespace CoreWebAPI.Controllers
             return data;
         }
 
-        public ActionResult Add(CategoryViewModel model)
+        [HttpPost]
+        public ActionResult<Category> Add(CategoryViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -55,19 +56,21 @@ namespace CoreWebAPI.Controllers
 
             try
             {
-                var result = _context.Categories.Add(new Category()
+                Category cat = new Category()
                 {
                     CategoryName = model.CategoryName
-                });
+                };
+                var result = _context.Categories.Add(cat);
                 _context.SaveChanges();
+
+
+                return CreatedAtAction(nameof(GetById), new { id = cat.Id }, cat);
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("message",$"Bir hata oluştu {ex.Message}");
+                return BadRequest();
             }
-
-            //return CreatedAtAction(nameof(GetById), new {id = model.Id}, model);
-            return Ok();
         }
 
 
